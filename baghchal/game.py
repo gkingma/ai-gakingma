@@ -98,7 +98,9 @@ class Game:
         self._turns = self._turns + 1
         self._board[move.fromRow][move.fromCol]=Const.MARK_NONE
         self._board[move.toRow][move.toCol]=move.mark
-        if move.capture:
+        if move.placement:
+            self._placed += 1
+        elif move.capture:
             capRow=(move.fromRow+move.toRow)//2
             capCol=(move.fromCol+move.toCol)//2
             self._board[capRow][capCol]=Const.MARK_NONE
@@ -121,7 +123,7 @@ class Game:
         self._state = Const.STATE_TURN_GOAT if (self._turns % 2 == 0) else Const.STATE_TURN_TIGER
         if move.placement:
             self._board[move.toRow][move.toCol] = Const.MARK_NONE
-            self._placed = self._placed - 1
+            self._placed -= 1
         else:
             self._board[move.fromRow][move.fromCol] = move.mark
             self._board[move.toRow][move.toCol] = Const.MARK_NONE

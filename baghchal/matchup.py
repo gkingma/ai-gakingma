@@ -1,5 +1,3 @@
-from hungrytigeragent import HungryTigerAgent
-from myscaredgoatagent import MyScaredGoatAgent
 from random import Random
 
 from game import Game
