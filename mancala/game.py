@@ -24,7 +24,12 @@ class Game():
     def board(self):
         """Current game board"""
         return self._board[:]
-
+    def state(self):
+        """State of board for qTable"""
+        s = ''
+        s.join(map(str,self._board[:]))
+        return s
+        
     def history(self):
         """Array of game boards"""
         return self._history[:]
@@ -128,7 +133,6 @@ class Game():
 
         if self.over():
             return self.score()
-
         # Illegal move if empty hole
         if self._board[idx] == 0:
             return self.score()
