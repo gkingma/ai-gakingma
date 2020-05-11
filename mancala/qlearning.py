@@ -1,6 +1,5 @@
 import random
 import numpy as np
-from numpy.lib.twodim_base import _min_int
 from game import Game
 from agent import Agent
 
