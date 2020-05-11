@@ -5,7 +5,7 @@ from game import Game
 from agent import Agent
 
 class QLearningAgent(Agent):
-    def __init__(self, games = 1000, alpha = .1, gamma = .6, epsilon = .1):
+    def __init__(self, games = 10000, alpha = .3, gamma = .7, epsilon = .2):
         self._games = games
         self._qTable = {}
         self._alpha = alpha
@@ -27,7 +27,9 @@ class QLearningAgent(Agent):
 
     def train(self):
         for i in range(self._games):
-            print(i)
+            self._alpha = ((self._games - i + 1) / self._games) * .6 + .3
+            self._gamma = ((self._games - i + 1) / self._games) * .5 + .4
+            #self._epsilon = ((self._games - i + 1) / self._games) * .8 + .1
             #train on games
             unresolvedQs = {1:{},2:{}}
             game = Game()
@@ -100,3 +102,40 @@ class QLearningAgent(Agent):
                         unresolvedQs[2][q][1] = unresolvedQs[2][q][1] + 25
                 self.resolveQs(unresolvedQs[1], 0)
                 self.resolveQs(unresolvedQs[2], 0)
+    
+    def _move(self, game):
+        game_clone, rot_flag = game.clone_turn()
+        state = game_clone.state()
+        if state in self._qTable:
+            moves = Agent.valid_indices(game_clone)
+            validState = True
+            for move in moves:
+                if self._qTable[state] == 0:
+                    validState = False
+            if validState:
+                maxQ = -10000
+                idx = moves[0]
+                for move in moves:
+                    if self._qTable[state][move] > maxQ:
+                        maxQ = self._qTable[state][move]
+                        idx = move
+                final_move = game.rotate_board(rot_flag, idx)
+                return final_move
+    
+        moves = Agent.valid_indices(game_clone)
+        scores = []
+        for move in moves:
+            clone = game_clone.clone()
+            clone.move(move)
+            scores.append(clone.score()[0])
+        maxScore = 0
+        for score in scores:
+            if score > maxScore:
+                maxScore = score
+        best_moves = []
+        for i in range(len(scores)):
+            if scores[i] == maxScore:
+                best_moves.append(moves[i])
+
+        final_move = game.rotate_board(rot_flag, random.choice(best_moves))
+        return final_move
