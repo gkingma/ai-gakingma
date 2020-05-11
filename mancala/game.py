@@ -26,9 +26,10 @@ class Game():
         return self._board[:]
     def state(self):
         """State of board for qTable"""
-        s = ''
-        s.join(map(str,self._board[:]))
-        return s
+        tempBoard = []
+        for b in self._board[:]:
+            tempBoard.append(str(b))
+        return "".join(tempBoard)
         
     def history(self):
         """Array of game boards"""

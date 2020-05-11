@@ -11,16 +11,23 @@ class QLearningAgent(Agent):
         self._alpha = alpha
         self._gamma = gamma
         self._epsilon = epsilon
+
+    def qTable(self):
+        f = open('output.txt', 'w+')
+        f.write(str(self._qTable))
+        f.close()
     
     def resolveQs(self, Qs, nextMax):
         for q in Qs:
             oldValue = self._qTable[q][Qs[q][0]]
             reward = Qs[q][1]
             self._qTable[q][Qs[q][0]] = oldValue * (1 - self._alpha) + self._alpha * (reward + self._gamma * nextMax)
-            Qs.pop(q)
+        while len(Qs):
+            Qs.popitem()
 
     def train(self):
         for i in range(self._games):
+            print(i)
             #train on games
             unresolvedQs = {1:{},2:{}}
             game = Game()
@@ -44,7 +51,7 @@ class QLearningAgent(Agent):
                         #choose random action
                         moves = Agent.valid_indices(game_clone)
                         idx = random.choice(moves)
-                        unresolvedQs[player[state]] = (int(idx), float(self._qTable[state][idx]))
+                        unresolvedQs[player][state] = [int(idx), float(self._qTable[state][idx])]
                         move = game.rotate_board(rot_flag, idx)
                         game.move(move)
                     else :
@@ -59,7 +66,7 @@ class QLearningAgent(Agent):
                             if validQs[i] == maxQ:
                                 idx = moves[i]
                         
-                        unresolvedQs[player[state]] = (int(idx), float(self._qTable[state][idx]))
+                        unresolvedQs[player][state] = [int(idx), float(self._qTable[state][idx])]
                         move = game.rotate_board(rot_flag, idx)
                         game.move(move)
                 else:
@@ -67,7 +74,7 @@ class QLearningAgent(Agent):
                     #choose random action
                     moves = Agent.valid_indices(game_clone)
                     idx = random.choice(moves)
-                    unresolvedQs[player[state]] = (int(idx), float(self._qTable[state][idx]))
+                    unresolvedQs[player][state] = [int(idx), float(self._qTable[state][idx])]
                     move = game.rotate_board(rot_flag, idx)
                     game.move(move)
                 
@@ -77,7 +84,7 @@ class QLearningAgent(Agent):
                 for q in unresolvedQs[1]:
                     unresolvedQs[1][q][1] = unresolvedQs[1][q][1] + scoreDifference
                 for q in unresolvedQs[2]:
-                    unresolvedQs[2][q][2] = unresolvedQs[2][q][2] - scoreDifference
+                    unresolvedQs[2][q][1] = unresolvedQs[2][q][1] - scoreDifference
                 previousPlayer = player
                 previousScore = game.score()
             
@@ -85,11 +92,11 @@ class QLearningAgent(Agent):
                     for q in unresolvedQs[1]:
                         unresolvedQs[1][q][1] = unresolvedQs[1][q][1] + 25
                     for q in unresolvedQs[2]:
-                        unresolvedQs[2][q][2] = unresolvedQs[2][q][2] - 25
+                        unresolvedQs[2][q][1] = unresolvedQs[2][q][1] - 25
                 else :
                     for q in unresolvedQs[1]:
                         unresolvedQs[1][q][1] = unresolvedQs[1][q][1] - 25
                     for q in unresolvedQs[2]:
-                        unresolvedQs[2][q][2] = unresolvedQs[2][q][2] + 25
+                        unresolvedQs[2][q][1] = unresolvedQs[2][q][1] + 25
                 self.resolveQs(unresolvedQs[1], 0)
                 self.resolveQs(unresolvedQs[2], 0)
